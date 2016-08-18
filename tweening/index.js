@@ -62,7 +62,7 @@ var render = function( t ) {
 	
 	lastTime = t;
 	
-	Tween.run( dt, 'nextTween' );
+	Tween.update( dt, 'nextTween' );
 	
 	ctx.fillStyle = "black";
 	ctx.fillRect( 0, 0, stage.width, stage.height );
