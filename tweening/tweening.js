@@ -22,13 +22,15 @@ proto.createTween = function( target, props, duration ) {
 			} );
 		};
 
-proto.update = function( dt, endTween ) {
+proto.update = function( dt ) {
 	for( var i = this.tweens.length - 1; i >= 0; --i ) {
 		var tween = this.tweens[ i ];
 		
 		tween.elapsed += dt;
 		
 		var n = tween.elapsed / tween.duration;
+		
+		tween.target.tweening = 1;
 		
 		for( var key in  tween.start ) {
 			tween.target[ key ] = Maths.lerp( tween.start[ key ], tween.end[ key ], n );
@@ -40,7 +42,7 @@ proto.update = function( dt, endTween ) {
 				tween.target[ key ] = tween.end[ key ];
 			}
 			
-			if( endTween ) tween.target[ endTween ]( tween.target );
+			tween.target.tweening = 0;
 			
 			this.tweens.splice( i, 1 );
 		}

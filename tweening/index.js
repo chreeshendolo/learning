@@ -21,11 +21,14 @@ var boxEnt = function( x, y, w, h, color, dest ) {
 	this.r = 0;
 	this.color = color;
 	
+	this.tweening = 0;
+	
 	this.tweens = [
 		{ x: x, y: y, w: w,	h: h, r: 0 },
 		{ x: stage.width * .5 - w * .5, y: stage.height * .5 - h * .5, w: w * 2, h: h * 2, r: Math.PI * 1 },
 		dest
 	];
+	
 	this.inc = -1;
 	this.state = 0;
 	
@@ -48,10 +51,10 @@ new boxEnt( 0, 208, 32, 32, "yellow", { x: 288, y: 0, w: 32, h: 32, r: Math.PI *
 new boxEnt( 288, 208, 32, 32, "red", { x: 0, y: 0, w: 32, h: 32, r: Math.PI * 2 } );
 
 
-for( var i = boxes.length - 1; i >= 0; --i ) {
-	var box = boxes[ i ];
-	box.nextTween();
-}
+//for( var i = boxes.length - 1; i >= 0; --i ) {
+//	var box = boxes[ i ];
+//	box.nextTween();
+//}
 
 var lastTime = 0;
 
@@ -62,7 +65,14 @@ var render = function( t ) {
 	
 	lastTime = t;
 	
-	Tween.update( dt, 'nextTween' );
+	for( var i = boxes.length - 1; i >= 0; --i ) {
+		var box = boxes[ i ];
+		if( !box.tweening ) {
+			box.nextTween();
+		}
+	}
+	
+	Tween.update( dt );
 	
 	ctx.fillStyle = "black";
 	ctx.fillRect( 0, 0, stage.width, stage.height );
