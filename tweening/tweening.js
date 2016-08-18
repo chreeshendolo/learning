@@ -6,7 +6,9 @@ var Tweening = function() {
 	
 var proto = Tweening.prototype;
 
-proto.createTween = function( target, props, duration ) {
+proto.createTween = function( target, props, duration, ease ) {
+			if ( !ease ) ease = "lerp";
+			
 			var start = {};
 			
 			for( var key in props ) {
@@ -18,7 +20,8 @@ proto.createTween = function( target, props, duration ) {
 				start: start,
 				end: props,
 				duration: duration,
-				elapsed: 0		
+				elapsed: 0,
+				ease: ease
 			} );
 		};
 
@@ -28,12 +31,10 @@ proto.update = function( dt ) {
 		
 		tween.elapsed += dt;
 		
-		var n = tween.elapsed / tween.duration;
-		
 		tween.target.tweening = 1;
 		
 		for( var key in  tween.start ) {
-			tween.target[ key ] = Maths.lerp( tween.start[ key ], tween.end[ key ], n );
+			tween.target[ key ] = Ease[ tween.ease ]( tween.elapsed, tween.start[ key ], tween.end[ key ], tween.duration );
 		}
 		
 		if ( tween.elapsed >= tween.duration ) {
