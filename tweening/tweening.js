@@ -22,7 +22,7 @@ proto.createTween = function( target, props, duration ) {
 			} );
 		};
 
-proto.run = function( dt, endTween ) {
+proto.update = function( dt, endTween ) {
 	for( var i = this.tweens.length - 1; i >= 0; --i ) {
 		var tween = this.tweens[ i ];
 		
