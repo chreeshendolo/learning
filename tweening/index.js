@@ -62,28 +62,7 @@ var render = function( t ) {
 	
 	lastTime = t;
 	
-	for( var i = Tween.tweens.length - 1; i >= 0; --i ) {
-		var tween = Tween.tweens[ i ];
-		
-		tween.elapsed += dt;
-		
-		var n = tween.elapsed / tween.duration;
-		
-		for( var key in  tween.start ) {
-			tween.target[ key ] = Maths.lerp( tween.start[ key ], tween.end[ key ], n );
-		}
-		
-		if ( tween.elapsed >= tween.duration ) {
-			
-			for( var key in  tween.start ) {
-				tween.target[ key ] = tween.end[ key ];
-			}
-			
-			tween.target.nextTween( tween.target );
-			
-			Tween.tweens.splice( i, 1 );
-		}
-	}
+	Tween.run( dt, 'nextTween' );
 	
 	ctx.fillStyle = "black";
 	ctx.fillRect( 0, 0, stage.width, stage.height );
