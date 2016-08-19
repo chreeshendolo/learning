@@ -1,5 +1,5 @@
 var Tween = new Tweening();
-
+var Render = new Rendering();
 console.log("yeah bud");
 
 var stage = document.createElement( "canvas" );
@@ -16,7 +16,7 @@ var rightPanel = {
 	y: 0,
 	w: 64,
 	h: stage.height,
-	color: 'grey'
+	c: 'grey'
 }
 
 stage.width += rightPanel.w;
@@ -60,13 +60,14 @@ var easeNames = getEaseNames();
 var selectedEase = {};
 
 var easeButtons = [];
-var easeButton = function( name, x, y, w, h ) {
-	this.name = name;
+var easeButton = function( t, x, y, w, h, f ) {
+	this.t = t;
 	this.x = x;
 	this.y = y;
 	this.w = w;
 	this.h = h;
-	this.color = "white";
+	this.c = "white";
+	this.f = f;
 	
 	easeButtons.push( this );
 };
@@ -82,21 +83,22 @@ var createButtons = function() {
 		var name = easeNames[ i ];
 		
 
-		
-		ctx.font = "10px Arial";
+		var font = 10;
+		ctx.font = font + "px Arial";
 		var txtWidth = ctx.measureText( name ).width;
 		
 		var txt = {
 			x: x + rightPanel.w * .5 - txtWidth * .5,
 			y: y,
 			w: txtWidth,
-			h: 9
+			h: 9,
+			f: font
 		}
 		
-		var bttn = new easeButton( name, txt.x, txt.y, txt.w, txt.h )
+		var bttn = new easeButton( name, txt.x, txt.y, txt.w, txt.h, txt.f )
 		
 		if( i === 0 ) { 
-			bttn.color = "red";
+			bttn.c = "red";
 			selectedEase = bttn;
 		}
 		
@@ -108,13 +110,13 @@ createButtons();
 
 var boxes = [];
 
-var boxEnt = function( x, y, w, h, color, dest ) {
+var boxEnt = function( x, y, w, h, c, dest ) {
 	this.x = x;
 	this.y = y;
 	this.w = w;
 	this.h = h;
 	this.r = 0;
-	this.color = color;
+	this.c = c;
 	
 	this.tweening = 0;
 	
@@ -137,7 +139,7 @@ boxEnt.prototype.nextTween = function() {
 	
 	this.state += this.inc;
 	
-	Tween.createTween( this, this.tweens[ this.state ], 1000, selectedEase.name );
+	Tween.createTween( this, this.tweens[ this.state ], 1000, selectedEase.t );
 }
 
 new boxEnt( 0, 0, 32, 32, "green", { x: 288, y: 208, w: 32, h: 32, r: Math.PI * 2 } );
@@ -159,9 +161,9 @@ var checkClick = function() {
 			
 			if( lrc && tbc ) {
 
-				selectedEase.color = "white";
+				selectedEase.c = "white";
 				selectedEase = bttn;
-				selectedEase.color = "red";
+				selectedEase.c = "red";
 			}
 		}
 		
@@ -173,8 +175,8 @@ var checkClick = function() {
 
 var lastTime = 0;
 
-var render = function( t ) {
-	requestAnimationFrame( render );
+var loop = function( t ) {
+	requestAnimationFrame( loop );
 	
 	var dt = t - lastTime;
 	
@@ -191,42 +193,24 @@ var render = function( t ) {
 	
 	checkClick();
 	
-	ctx.fillStyle = "black";
-	ctx.fillRect( 0, 0, stage.width, stage.height );
-
-	ctx.fillStyle = rightPanel.color;
-	ctx.fillRect( rightPanel.x, rightPanel.y, rightPanel.w, rightPanel.h );
-	
-	for( var i = boxes.length - 1; i >= 0; --i ) {
-		var box = boxes[ i ];
-		
-		var bx = box.x,
-			by = box.y,
-			bw = box.w,
-			bh = box.h,
-			bwh = bw * .5,
-			bhh = bh * .5;
-		
-		ctx.save();
-				
-		ctx.translate( bx + bwh, by + bhh );
-		
-		ctx.rotate( box.r );
-		
-		ctx.fillStyle = box.color;
-		ctx.fillRect( -bwh, -bhh, bw, bh );
-		
-		ctx.restore();
-	}
-	
 	for( var i = easeButtons.length - 1; i >= 0; --i ) {
 		var bttn = easeButtons[ i ];
 		
-		ctx.fillStyle = bttn.color;
-		ctx.fillText( bttn.name, bttn.x, bttn.y + 7 );
+		Render.createRender( bttn, [ 'fillText' ] );
 	}
+	
+	Render.createRender( rightPanel );
+	
+	for( var i = boxes.length - 1; i >= 0; --i ) {
+		var box = boxes[ i ];
+		Render.createRender( box, [ 'fillRect', 'strokeRect' ] );
+	}
+	
+	Render.update();
+	
+
 }
 
 
 
-requestAnimationFrame( render );
+requestAnimationFrame( loop );
